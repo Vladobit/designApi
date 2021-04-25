@@ -15,6 +15,11 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('logout', 'App\Http\Controllers\Auth\LoginController@logout');
     Route::put('settings/profile', 'App\Http\Controllers\User\SettingsController@updateProfile');
     Route::put('settings/password', 'App\Http\Controllers\User\SettingsController@updatePassword');
+
+    //Upload Images
+    Route::post('designs', 'App\Http\Controllers\Designs\UploadController@upload');
+    Route::put('designs/{id}', 'App\Http\Controllers\Designs\DesignController@update');
+    Route::delete('designs/{id}', 'App\Http\Controllers\Designs\DesignController@destroy');
 });
 
 //Route group for guest users onlu
