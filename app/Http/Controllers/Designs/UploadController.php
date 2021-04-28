@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Designs;
 use App\Http\Controllers\Controller;
 use App\Jobs\UploadImage;
 use Illuminate\Http\Request;
-// use App\Repositories\Contracts\IDesign;
+use App\Repositories\Contracts\IDesign;
 
 class UploadController extends Controller
 {
-    protected $designs;
+    protected $design;
 
-    // public function __construct(IDesign $designs)
-    // {
-    //     $this->designs = $designs;
-    // }
+    public function __construct(IDesign $design)
+    {
+        $this->designs = $design;
+    }
 
     public function upload(Request $request)
     {
@@ -36,16 +36,16 @@ class UploadController extends Controller
         $tmp = $image->storeAs('uploads/original', $filename, 'tmp');
 
         // create the database record for the design
-        $design = auth()->user()->designs()->create([
-            'image' => $filename,
-            'disk' => config('site.upload_disk')
-        ]);
-
-        // $design = $this->designs()->create([
-        //     'user_id' => auth()->id(),
+        // $design = auth()->user()->designs()->create([
         //     'image' => $filename,
         //     'disk' => config('site.upload_disk')
         // ]);
+
+        $design = $this->designs->create([
+            'user_id' => auth()->id(),
+            'image' => $filename,
+            'disk' => config('site.upload_disk')
+        ]);
 
         // dispatch a job to handle the image manipulation
         $this->dispatch(new UploadImage($design));

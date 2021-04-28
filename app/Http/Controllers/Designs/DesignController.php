@@ -5,16 +5,43 @@ namespace App\Http\Controllers\Designs;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DesignResource;
 use App\Models\Design;
+use App\Repositories\Contracts\IDesign;
+use App\Repositories\Eloquent\Criteria\ForUser;
+use App\Repositories\Eloquent\Criteria\IsLive;
+use App\Repositories\Eloquent\Criteria\LatestFirst;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DesignController extends Controller
 {
+    protected $design;
+
+    public function __construct(IDesign $design)
+    {
+        $this->designs = $design;
+    }
+
+
+    public function index()
+    {
+        $design = $this->designs->withCriteria([
+            new LatestFirst(),
+            // new IsLive(),
+            // new ForUser(2)
+        ])->all();   //mozi ->paginate(1) da bidi
+        return DesignResource::collection($design);
+    }
+
+    public function findDesign($id)
+    {
+        $design = $this->designs->find($id);
+        return new DesignResource($design);
+    }
     public function update(Request $request, $id)
     {
 
-        $design = Design::findOrFail($id);
+        $design = $this->designs->find($id);
 
         $this->authorize('update', $design);
 
@@ -26,7 +53,7 @@ class DesignController extends Controller
 
 
 
-        $design->update([
+        $design = $this->designs->update($id, [
             'title' => $request->title,
             'description' => $request->description,
             'slug' => Str::slug($request->title),
@@ -34,14 +61,14 @@ class DesignController extends Controller
         ]);
 
         //apply Tags
-        $design->retag($request->tags);
+        $this->designs->applyTags($id, $request->tags);
 
         return new DesignResource($design);
     }
 
     public function destroy($id)
     {
-        $design = Design::findOrFail($id);
+        $design = $this->designs->find($id);
 
         $this->authorize('delete', $design);
 
@@ -53,7 +80,7 @@ class DesignController extends Controller
                 Storage::disk($design->disk)->delete("uploads/designs/{$size}/" . $design->image);
             }
         }
-        $design->delete();
+        $this->designs->delete();
         return response()->json(['message' => 'Record deleted'], 200);
     }
 }

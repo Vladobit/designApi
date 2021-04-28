@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Route;
 //Public routes
 Route::get('me', 'App\Http\Controllers\User\MeController@getMe');
 
+// Get Designs
+Route::get('designs', 'App\Http\Controllers\Designs\DesignController@index');
+Route::get('designs/{id}', 'App\Http\Controllers\Designs\DesignController@findDesign');
+
+
+
+// Get Designs
+Route::get('users', 'App\Http\Controllers\User\UserController@index');
 
 //Route group for authenticated users onlu
 Route::group(['middleware' => ['auth:api']], function () {
