@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Designs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DesignResource;
-use App\Models\Design;
 use App\Repositories\Contracts\IDesign;
+use App\Repositories\Eloquent\Criteria\EagerLoad;
 use App\Repositories\Eloquent\Criteria\ForUser;
 use App\Repositories\Eloquent\Criteria\IsLive;
 use App\Repositories\Eloquent\Criteria\LatestFirst;
@@ -27,8 +27,12 @@ class DesignController extends Controller
     {
         $design = $this->designs->withCriteria([
             new LatestFirst(),
-            // new IsLive(),
-            // new ForUser(2)
+            new IsLive(),
+            new ForUser(2),
+            new EagerLoad([
+                'user',
+                'comments'
+            ])
         ])->all();   //mozi ->paginate(1) da bidi
         return DesignResource::collection($design);
     }
@@ -80,7 +84,20 @@ class DesignController extends Controller
                 Storage::disk($design->disk)->delete("uploads/designs/{$size}/" . $design->image);
             }
         }
-        $this->designs->delete();
+        $this->designs->delete($id);
         return response()->json(['message' => 'Record deleted'], 200);
+    }
+
+    public function like($id)
+    {
+        $this->designs->like($id);
+
+        return response()->json(['message' => 'Successful'], 200);
+    }
+
+    public function checkIfUserHasLiked($designId)
+    {
+        $isLiked = $this->designs->isLikedByUser($designId);
+        return response()->json(['liked' => $isLiked], 200);
     }
 }

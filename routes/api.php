@@ -28,6 +28,15 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('designs', 'App\Http\Controllers\Designs\UploadController@upload');
     Route::put('designs/{id}', 'App\Http\Controllers\Designs\DesignController@update');
     Route::delete('designs/{id}', 'App\Http\Controllers\Designs\DesignController@destroy');
+
+    //Comments
+    Route::post('designs/{id}/comments', 'App\Http\Controllers\Designs\CommentController@store');
+    Route::put('comments/{id}', 'App\Http\Controllers\Designs\CommentController@update');
+    Route::delete('comments/{id}', 'App\Http\Controllers\Designs\CommentController@destroy');
+
+    //Likes
+    Route::post('designs/{id}/like', 'App\Http\Controllers\Designs\DesignController@like');
+    Route::get('designs/{id}/liked', 'App\Http\Controllers\Designs\DesignController@checkIfUserHasLiked');
 });
 
 //Route group for guest users onlu
