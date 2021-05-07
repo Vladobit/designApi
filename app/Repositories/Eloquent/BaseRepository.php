@@ -22,6 +22,7 @@ abstract class BaseRepository implements IBase, ICriteria
     {
         return $this->model->get();
     }
+
     public function find($id)
     {
         $result = $this->model->findOrFail($id);
@@ -32,6 +33,7 @@ abstract class BaseRepository implements IBase, ICriteria
     {
         return $this->model->where($column, $value)->get();
     }
+
 
     public function findWhereFirst($column, $value)
     {
@@ -45,7 +47,8 @@ abstract class BaseRepository implements IBase, ICriteria
 
     public function create(array $data)
     {
-        return $this->model->create($data);
+        $result = $this->model->create($data);
+        return $result;
     }
 
     public function update($id, array $data)
@@ -61,14 +64,19 @@ abstract class BaseRepository implements IBase, ICriteria
         return $record->delete();
     }
 
+
     public function withCriteria(...$criteria)
     {
         $criteria = Arr::flatten($criteria);
+
         foreach ($criteria as $criterion) {
             $this->model = $criterion->apply($this->model);
         }
+
         return $this;
     }
+
+
 
     protected function getModelClass()
     {
@@ -76,6 +84,7 @@ abstract class BaseRepository implements IBase, ICriteria
             throw new ModelNotDefined();
         }
 
+        //treba= return app()->make($this->model());
         return app()->make($this->model());
     }
 }

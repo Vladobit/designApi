@@ -40,6 +40,14 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'remember_token',
     ];
 
+    protected $appends = [
+        'photo_url'
+    ];
+
+    public function getPhotoUrlAttribute()
+    {
+        return 'https://www.gravatar.com/avatar/' . md5(strtolower($this->email)) . '.jpg?s=200&d=mm';
+    }
     /**
      * The attributes that should be cast to native types.
      *
@@ -47,6 +55,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'available_to_hire' => 'boolean'
     ];
 
     public function sendEmailVerificationNotification()
@@ -55,14 +64,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
 
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
+
 
     public function sendPasswordResetNotification($token)
     {
@@ -85,5 +87,62 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function comment()
     {
         return  $this->hasMany(Comment::class);
+    }
+    // teams that the user belongs to
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class)
+            ->withTimestamps();
+    }
+
+    public function ownedTeams()
+    {
+        return $this->teams()
+            ->where('owner_id', $this->id);
+    }
+
+    public function isOwnerOfTeam($team)
+    {
+        return (bool)$this->teams()
+            ->where('id', $team->id)
+            ->where('owner_id', $this->id)
+            ->count();
+    }
+
+
+
+    // Relationships for invitations
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class, 'recipient_email', 'email');
+    }
+
+    // relationships for chat messaging
+    public function chats()
+    {
+        return $this->belongsToMany(Chat::class, 'participants');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function getChatWithUser($user_id)
+    {
+        $chat = $this->chats()
+            ->whereHas('participants', function ($query)  use ($user_id) {
+                $query->where('user_id', $user_id);
+            })
+            ->first();
+        return $chat;
+    }
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

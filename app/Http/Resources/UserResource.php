@@ -19,7 +19,9 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'email' => $this->email,
             'name' => $this->name,
-            'designs' => $this->desings,
+            'designs' => DesignResource::collection(
+                $this->whenLoaded('desings')
+            ),
             'created_dates' => [
                 'created_at_human' => $this->created_at->diffForHumans(),
                 'creates_at' => $this->created_at
