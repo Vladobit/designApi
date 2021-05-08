@@ -53,6 +53,16 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('invitation/{id}/respond', 'App\Http\Controllers\Teams\InvitationsController@respond');
     Route::delete('invitation/{id}', 'App\Http\Controllers\Teams\InvitationsController@destroy');
 
+
+    //Chats
+    Route::post('chats', 'App\Http\Controllers\Chats\ChatsController@sendMessage');
+    Route::get('chats', 'App\Http\Controllers\Chats\ChatsController@getUserChats');
+    Route::get('chats/{id}/messages', 'App\Http\Controllers\Chats\ChatsController@getChatMessages');
+    Route::put('chats/{id}/markAsRead', 'App\Http\Controllers\Chats\ChatsController@markAsRead');
+    Route::delete('messages/{id}', 'App\Http\Controllers\Chats\ChatsController@destroy');
+
+
+
     //Likes
     Route::post('designs/{id}/like', 'App\Http\Controllers\Designs\DesignController@like');
     Route::get('designs/{id}/liked', 'App\Http\Controllers\Designs\DesignController@checkIfUserHasLiked');
