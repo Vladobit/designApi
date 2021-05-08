@@ -17,10 +17,13 @@ Route::get('designs/{id}', 'App\Http\Controllers\Designs\DesignController@findDe
 //Teams
 Route::get('teams/slug/{slug}', 'App\Http\Controllers\Teams\TeamsController@findBySlug');
 
-
-
-// Get Designs
+// Get users
 Route::get('users', 'App\Http\Controllers\User\UserController@index');
+
+
+//Search Design
+Route::get('search/designs', 'App\Http\Controllers\Designs\DesignController@search');
+Route::get('search/designers', 'App\Http\Controllers\User\UserController@search');
 
 //Route group for authenticated users onlu
 Route::group(['middleware' => ['auth:api']], function () {
