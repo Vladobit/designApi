@@ -12,13 +12,17 @@ Route::get('me', 'App\Http\Controllers\User\MeController@getMe');
 // Get Designs
 Route::get('designs', 'App\Http\Controllers\Designs\DesignController@index');
 Route::get('designs/{id}', 'App\Http\Controllers\Designs\DesignController@findDesign');
+Route::get('designs/slug/{slug}', 'App\Http\Controllers\Designs\DesignController@findBySlug');
 
 
 //Teams
 Route::get('teams/slug/{slug}', 'App\Http\Controllers\Teams\TeamsController@findBySlug');
+Route::get('teams/{id}/designs', 'App\Http\Controllers\Designs\DesignController@getForTeam');
 
 // Get users
 Route::get('users', 'App\Http\Controllers\User\UserController@index');
+Route::get('user/{username}', 'App\Http\Controllers\User\UserController@findByUsername');
+Route::get('users/{id}/designs', 'App\Http\Controllers\Designs\DesignsController@getForUser');
 
 
 //Search Design

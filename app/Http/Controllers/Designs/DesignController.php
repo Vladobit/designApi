@@ -42,6 +42,7 @@ class DesignController extends Controller
         $design = $this->designs->find($id);
         return new DesignResource($design);
     }
+
     public function update(Request $request, $id)
     {
 
@@ -102,9 +103,32 @@ class DesignController extends Controller
         $isLiked = $this->designs->isLikedByUser($designId);
         return response()->json(['liked' => $isLiked], 200);
     }
+
     public function search(Request $request)
     {
         $design = $this->designs->search($request);
+        return DesignResource::collection($design);
+    }
+
+    public function findBySlug($slug)
+    {
+        $design = $this->designs->withCriteria([new IsLive()])->findWhereFirst('slug', $slug);
+        return new DesignResource($design);
+    }
+
+    public function getForTeam($teamId)
+    {
+        $design = $this->designs
+            ->withCriteria([new IsLive()])
+            ->findWhereFirst('team_id', $teamId);
+        return DesignResource::collection($design);
+    }
+
+    public function getForUser($userId)
+    {
+        $design = $this->designs
+            ->withCriteria([new IsLive()])
+            ->findWhereFirst('user_id', $userId);
         return DesignResource::collection($design);
     }
 }
